@@ -1,0 +1,1 @@
+[1 лаба](https://docs.google.com/document/d/1jWQMdtv2SonkDddJDBUoHpM_hKRxyt67hhcO1jn3cfc/edit?tab=t.0)
