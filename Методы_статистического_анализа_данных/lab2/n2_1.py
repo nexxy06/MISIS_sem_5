@@ -133,7 +133,7 @@ def plot_histogram(intervals, relative_frequencies):
 
 def main():
     # 1. Загрузка и анализ генеральной совокупности
-    print("=== АНАЛИЗ ГЕНЕРАЛЬНОЙ СОВОКУПНОСТИ ===")
+    print("АНАЛИЗ ГЕНЕРАЛЬНОЙ СОВОКУПНОСТИ")
     data = load_file("Москва_2021.txt")
 
     pop_mean = mean(data)

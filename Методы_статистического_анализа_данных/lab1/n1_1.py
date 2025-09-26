@@ -6,7 +6,7 @@ k = 7
 
 def load_file(fname):
     d = []
-    with open("Москва_2021.txt", "r") as f:
+    with open("./Методы_статистического_анализа_данных/lab1/Москва_2021.txt", "r") as f:
         for line in f:
             if line.strip():
                 d.append(int(line.strip()))
