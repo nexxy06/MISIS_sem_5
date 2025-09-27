@@ -87,11 +87,8 @@ def create_interval_series(sample_means, interval_length=1):
 
 def print_interval_series(intervals, frequencies, relative_frequencies):
     """Вывод интервального ряда в табличном виде"""
-    print("\n" + "=" * 60)
-    print("ИНТЕРВАЛЬНЫЙ РЯД РАСПРЕДЕЛЕНИЯ ВЫБОРОЧНЫХ СРЕДНИХ")
-    print("=" * 60)
+    print("\nИНТЕРВАЛЬНЫЙ РЯД РАСПРЕДЕЛЕНИЯ ВЫБОРОЧНЫХ СРЕДНИХ")
     print(f"{'Интервал':<15} {'Абс. частота':<12} {'Отн. частота':<12}")
-    print("-" * 40)
 
     for i, interval in enumerate(intervals):
         abs_freq = frequencies[i]
