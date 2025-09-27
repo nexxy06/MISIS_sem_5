@@ -8,6 +8,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../lab1'))
 from n1_1 import mean, variance, std_dev, load_file
 
 
+gamma = 0.95
+num_samples = 36
+delta = 3  # точность (годы) для расчёта объёма выборки
+random.seed(42)
+
+
 def calculate_assymetry(data, average, stddev):
     """Расчет асимметрии (из 1.2.py)"""
     total = sum(item[1] for item in data)
@@ -94,7 +100,6 @@ def print_interval_series(intervals, frequencies, relative_frequencies):
 
 
 def plot_histogram(intervals, relative_frequencies):
-    """Построение гистограммы относительных частот"""
     # Центры интервалов для позиционирования столбцов
     interval_centers = [(interval[0] + interval[1]) / 2 for interval in intervals]
     interval_widths = [interval[1] - interval[0] for interval in intervals]
@@ -132,7 +137,6 @@ def plot_histogram(intervals, relative_frequencies):
 
 
 def main():
-    # 1. Загрузка и анализ генеральной совокупности
     print("АНАЛИЗ ГЕНЕРАЛЬНОЙ СОВОКУПНОСТИ")
     data = load_file("Москва_2021.txt")
 
@@ -145,10 +149,7 @@ def main():
     print(f"Дисперсия: {pop_var:.2f}")
     print(f"Стандартное отклонение: {pop_std:.2f} лет")
 
-    # 2. Расчет объема выборки
-    print("\n=== РАСЧЕТ ОБЪЕМА ВЫБОРКИ ===")
-    gamma = 0.95  # надежность
-    delta = 3  # точность (годы)
+    print("\nРАСЧЕТ ОБЪЕМА ВЫБОРКИ")
 
     sample_size = calculate_sample_size(pop_std, delta, gamma)
     print(f"Надежность (γ): {gamma}")
@@ -156,10 +157,7 @@ def main():
     print(f"Стандартное отклонение генеральной совокупности (σ): {pop_std:.2f} лет")
     print(f"Необходимый объем выборки: {sample_size}")
 
-    # 3. Генерация 36 выборок
-    print("\n=== ГЕНЕРАЦИЯ ВЫБОРОК ===")
-    num_samples = 36
-    random.seed(42)  # для воспроизводимости
+    print("\nГЕНЕРАЦИЯ ВЫБОРОК")
 
     sample_means = generate_samples(data, sample_size, num_samples)
 
@@ -169,16 +167,13 @@ def main():
     print(f"Максимальная выборочная средняя: {max(sample_means):.2f}")
     print(f"Среднее выборочных средних: {mean(sample_means):.2f}")
 
-    # 4. Построение интервального ряда
+    # Интервальный ряд
     intervals, frequencies, relative_frequencies = create_interval_series(sample_means)
     print_interval_series(intervals, frequencies, relative_frequencies)
 
-    # 5. Построение гистограммы
-    print("\n=== ПОСТРОЕНИЕ ГИСТОГРАММЫ ===")
     plot_histogram(intervals, relative_frequencies)
 
-    # 6. Проверка точности оценки
-    print("\n=== ПРОВЕРКА ТОЧНОСТИ ОЦЕНКИ ===")
+    print("\nПРОВЕРКА ТОЧНОСТИ ОЦЕНКИ")
     sample_means_mean = mean(sample_means)
     error = abs(sample_means_mean - pop_mean)
 
