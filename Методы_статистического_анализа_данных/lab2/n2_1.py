@@ -40,7 +40,7 @@ def main():
     print(f"Стандартное отклонение: {sigma_estimate:.2f}")
     print(f"Объем выборки: {n}")
 
-    random.seed(42)
+    # random.seed(42)
     sample_means = []
 
     for i in range(num_samples):
@@ -81,17 +81,6 @@ def main():
     overall_mean = mean(sample_means)
     overall_std = std(sample_means, ddof=1)
 
-    # theoretical_frequencies = []
-    # for interval in intervals:
-    #     z1 = (interval[0] - overall_mean) / overall_std
-    #     z2 = (interval[1] - overall_mean) / overall_std
-    #     prob = normal_cdf(z2) - normal_cdf(z1)
-    #     theoretical_frequencies.append(prob * len(sample_means))
-
-    # print(f"\nВыравнивание ряда:")
-    # print("Интервал       Набл.частота Теор.частота")
-    # for i, interval in enumerate(intervals):
-    #     print(f"{interval[0]:5.1f}-{interval[1]:5.1f}  {frequencies[i]:12d}  {theoretical_frequencies[i]:12.2f}")
 
     x_positions = [interval[0] for interval in intervals]
     width = interval_length
