@@ -1,184 +1,128 @@
-import sys
-import os
 import math
 import random
 import matplotlib.pyplot as plt
-sys.path.append(os.path.join(os.path.dirname(__file__), '../lab1'))
-# Импорт функций из ваших файлов
-from n1_1 import mean, variance, std_dev, load_file
 
 
-gamma = 0.95
-num_samples = 36
-delta = 3  # точность (годы) для расчёта объёма выборки
-random.seed(42)
+def read_data(filename):
+    with open(filename, "r") as f:
+        return [int(line.strip()) for line in f.readlines()]
 
 
-def calculate_assymetry(data, average, stddev):
-    """Расчет асимметрии (из 1.2.py)"""
-    total = sum(item[1] for item in data)
-    return sum(((k[0] - average) ** 3) * k[1] for k in data) / total / (stddev**3)
+def mean(data):
+    return sum(data) / len(data)
 
 
-def calculate_excess(data, average, stddev):
-    """Расчет эксцесса (из 1.2.py)"""
-    total = sum(item[1] for item in data)
-    return sum(((k[0] - average) ** 4) * k[1] for k in data) / total / (stddev**4) - 3
+def std(data, ddof=0):
+    m = mean(data)
+    variance = sum((x - m) ** 2 for x in data) / (len(data) - ddof)
+    return math.sqrt(variance)
 
 
-def calculate_sample_size(sigma, delta, gamma):
-    """
-    n = t²σ²/δ²
-    """
-    # Определяем t по таблице Лапласа для заданной надежности
-    if gamma == 0.95:
-        t = 1.96
-    elif gamma == 0.99:
-        t = 2.58
-    elif gamma == 0.999:
-        t = 3.29
-    else:
-        t = 2.0
-
-    n = (t**2 * sigma**2) / delta**2
-    return math.ceil(n)
-
-
-def generate_samples(data, sample_size, num_samples):
-    """Генерация выборок и вычисление выборочных средних"""
-    sample_means = []
-
-    for _ in range(num_samples):
-        # Повторная выборка (с возвращением)
-        sample = random.choices(data, k=sample_size)
-        sample_mean = mean(sample)
-        sample_means.append(sample_mean)
-
-    return sample_means
-
-
-def create_interval_series(sample_means, interval_length=1):
-    """Создание интервального ряда распределения"""
-    min_mean = math.floor(min(sample_means))
-    max_mean = math.ceil(max(sample_means))
-
-    # Создание интервалов
-    intervals = []
-    current = min_mean
-    while current <= max_mean:
-        intervals.append((current, current + interval_length))
-        current += interval_length
-
-    # Подсчет частот
-    frequencies = []
-    for interval in intervals:
-        count = 0
-        for mean_val in sample_means:
-            if interval[0] <= mean_val < interval[1]:
-                count += 1
-        frequencies.append(count)
-
-    # Относительные частоты
-    total_samples = len(sample_means)
-    relative_frequencies = [freq / total_samples for freq in frequencies]
-
-    return intervals, frequencies, relative_frequencies
-
-
-def print_interval_series(intervals, frequencies, relative_frequencies):
-    """Вывод интервального ряда в табличном виде"""
-    print("\nИНТЕРВАЛЬНЫЙ РЯД РАСПРЕДЕЛЕНИЯ ВЫБОРОЧНЫХ СРЕДНИХ")
-    print(f"{'Интервал':<15} {'Абс. частота':<12} {'Отн. частота':<12}")
-
-    for i, interval in enumerate(intervals):
-        abs_freq = frequencies[i]
-        rel_freq = relative_frequencies[i]
-        print(f"{interval[0]:.1f}-{interval[1]:.1f}{abs_freq:>12}{rel_freq:>12.3f}")
-
-
-def plot_histogram(intervals, relative_frequencies):
-    # Центры интервалов для позиционирования столбцов
-    interval_centers = [(interval[0] + interval[1]) / 2 for interval in intervals]
-    interval_widths = [interval[1] - interval[0] for interval in intervals]
-
-    plt.figure(figsize=(12, 6))
-    plt.bar(
-        interval_centers,
-        relative_frequencies,
-        width=0.8,
-        alpha=0.7,
-        color="skyblue",
-        edgecolor="black",
-    )
-
-    plt.xlabel("Выборочная средняя (возраст, лет)")
-    plt.ylabel("Относительная частота")
-    plt.title("Распределение выборочных средних возраста преступников")
-    plt.grid(axis="y", alpha=0.3)
-
-    # Добавление значений на столбцы
-    for i, (center, freq) in enumerate(zip(interval_centers, relative_frequencies)):
-        if freq > 0:
-            plt.text(
-                center,
-                freq + 0.005,
-                f"{freq:.3f}",
-                ha="center",
-                va="bottom",
-                fontsize=9,
-            )
-
-    plt.xticks(interval_centers, [f"{center:.1f}" for center in interval_centers])
-    plt.tight_layout()
-    plt.show()
+def normal_cdf(x, mu=0, sigma=1):
+    return (1 + math.erf((x - mu) / (sigma * math.sqrt(2)))) / 2
 
 
 def main():
-    print("АНАЛИЗ ГЕНЕРАЛЬНОЙ СОВОКУПНОСТИ")
-    data = load_file("Москва_2021.txt")
+    gamma = 0.95
+    delta = 3
+    num_samples = 36
 
-    pop_mean = mean(data)
-    pop_var = variance(data, pop_mean)
-    pop_std = std_dev(pop_var)
+    ages = read_data("./Методы_статистического_анализа_данных/lab1/Москва_2021.txt")
 
-    print(f"Объем генеральной совокупности: {len(data)}")
-    print(f"Средний возраст: {pop_mean:.2f} лет")
-    print(f"Дисперсия: {pop_var:.2f}")
-    print(f"Стандартное отклонение: {pop_std:.2f} лет")
+    sigma_estimate = std(ages, ddof=1)
+    t = 1.96
 
-    print("\nРАСЧЕТ ОБЪЕМА ВЫБОРКИ")
+    n_required = (t**2 * sigma_estimate**2) / delta**2
+    n = int(math.ceil(n_required))
 
-    sample_size = calculate_sample_size(pop_std, delta, gamma)
-    print(f"Надежность (γ): {gamma}")
-    print(f"Точность (δ): {delta} лет")
-    print(f"Стандартное отклонение генеральной совокупности (σ): {pop_std:.2f} лет")
-    print(f"Необходимый объем выборки: {sample_size}")
+    print(f"Объем генеральной совокупности: {len(ages)}")
+    print(f"Средний возраст: {mean(ages):.2f}")
+    print(f"Стандартное отклонение: {sigma_estimate:.2f}")
+    print(f"Объем выборки: {n}")
 
-    print("\nГЕНЕРАЦИЯ ВЫБОРОК")
+    random.seed(42)
+    sample_means = []
 
-    sample_means = generate_samples(data, sample_size, num_samples)
+    for i in range(num_samples):
+        sample = random.choices(ages, k=n)  
+        sample_mean = mean(sample)
+        sample_means.append(sample_mean)
 
-    print(f"Количество выборок: {num_samples}")
-    print(f"Объем каждой выборки: {sample_size}")
-    print(f"Минимальная выборочная средняя: {min(sample_means):.2f}")
-    print(f"Максимальная выборочная средняя: {max(sample_means):.2f}")
-    print(f"Среднее выборочных средних: {mean(sample_means):.2f}")
+    print(f"\nВыборочные средние:")
+    for i, sm in enumerate(sample_means):
+        print(f"Выборка {i+1:2d}: {sm:.2f}")
 
-    # Интервальный ряд
-    intervals, frequencies, relative_frequencies = create_interval_series(sample_means)
-    print_interval_series(intervals, frequencies, relative_frequencies)
+    min_mean = math.floor(min(sample_means))
+    max_mean = math.ceil(max(sample_means))
+    interval_length = 1
 
-    plot_histogram(intervals, relative_frequencies)
+    intervals = []
+    current = min_mean
+    while current < max_mean:
+        intervals.append((current, current + interval_length))
+        current += interval_length
 
-    print("\nПРОВЕРКА ТОЧНОСТИ ОЦЕНКИ")
-    sample_means_mean = mean(sample_means)
-    error = abs(sample_means_mean - pop_mean)
+    frequencies = []
+    for interval in intervals:
+        count = sum(
+            1 for mean_val in sample_means if interval[0] <= mean_val < interval[1]
+        )
+        frequencies.append(count)
 
-    print(f"Истинное среднее генеральной совокупности: {pop_mean:.2f}")
-    print(f"Среднее выборочных средних: {sample_means_mean:.2f}")
-    print(f"Ошибка оценки: {error:.2f} лет")
-    print(f"Требуемая точность: {delta} лет")
-    print(f"Условие выполняется: {error <= delta}")
+    relative_frequencies = [freq / len(sample_means) for freq in frequencies]
+
+    print(f"\nИнтервальный ряд:")
+    print("Интервал       Абс.частота Отн.частота")
+    for i, interval in enumerate(intervals):
+        print(
+            f"{interval[0]:5.1f}-{interval[1]:5.1f}  {frequencies[i]:11d}  {relative_frequencies[i]:11.3f}"
+        )
+
+    overall_mean = mean(sample_means)
+    overall_std = std(sample_means, ddof=1)
+
+    # theoretical_frequencies = []
+    # for interval in intervals:
+    #     z1 = (interval[0] - overall_mean) / overall_std
+    #     z2 = (interval[1] - overall_mean) / overall_std
+    #     prob = normal_cdf(z2) - normal_cdf(z1)
+    #     theoretical_frequencies.append(prob * len(sample_means))
+
+    # print(f"\nВыравнивание ряда:")
+    # print("Интервал       Набл.частота Теор.частота")
+    # for i, interval in enumerate(intervals):
+    #     print(f"{interval[0]:5.1f}-{interval[1]:5.1f}  {frequencies[i]:12d}  {theoretical_frequencies[i]:12.2f}")
+
+    x_positions = [interval[0] for interval in intervals]
+    width = interval_length
+
+    plt.figure(figsize=(12, 6))
+    plt.bar(
+        x_positions, relative_frequencies, width=width, alpha=0.7, edgecolor="black"
+    )
+    plt.xlabel("Выборочное среднее")
+    plt.ylabel("Относительная частота")
+    plt.title("Распределение выборочных средних")
+    plt.grid(True, alpha=0.3)
+    plt.xticks(x_positions, rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+    demo_sample = random.choices(ages, k=n)
+    sample_mean = mean(demo_sample)
+    sample_std = std(demo_sample, ddof=1)
+
+    t_normal = 1.96
+    margin = t_normal * sample_std / math.sqrt(n)
+    conf_interval = (sample_mean - margin, sample_mean + margin)
+
+    print(f"\nДоверительный интервал (нормальное распределение):")
+    print(f"Выборочное среднее: {sample_mean:.2f}")
+    print(f"Исправленное СКО: {sample_std:.2f}")
+    print(f"t-значение: {t_normal}")
+    print(f"Погрешность: ±{margin:.2f}")
+    print(f"Доверительный интервал: ({conf_interval[0]:.2f}, {conf_interval[1]:.2f})")
+    print(f"Ширина интервала: {conf_interval[1] - conf_interval[0]:.2f}")
 
 
 if __name__ == "__main__":

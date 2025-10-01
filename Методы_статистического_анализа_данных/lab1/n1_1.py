@@ -4,6 +4,27 @@ import matplotlib.pyplot as plt
 k = 7
 
 
+with open('./Методы_статистического_анализа_данных/lab1/Москва_2021.txt', 'r') as infile:
+    dataraw = infile.read()
+
+data = [int(item) for item in dataraw.splitlines()]
+
+h = (max(data) - min(data)) / k
+h = math.ceil(h)
+
+intervals = [(min(data) + i*h, min(data) + (i+1)*h) for i in range(k)]
+
+intervals_frequencies = {interval: 0 for interval in intervals}
+
+for value in data:
+    for interval in intervals:
+        if interval[0] <= value < interval[1]:
+            intervals_frequencies[interval] += 1
+            break
+
+print(intervals_frequencies)
+
+
 def load_file(fname):
     d = []
     with open("./Методы_статистического_анализа_данных/lab1/Москва_2021.txt", "r") as f:
@@ -30,13 +51,12 @@ def make_interval_series(d):
 
     h = math.ceil((x_max - x_min) / k)
     x_max = x_min + k * h
-    print(x_min, x_max)
     intervals = []
     for i in range(k):
         a = x_min + i * h
         b = x_min + (i + 1) * h
         intervals.append((math.ceil(a), math.ceil(b)))
-    print(intervals)
+    # print(intervals)
 
     n_i = []
     mid = []

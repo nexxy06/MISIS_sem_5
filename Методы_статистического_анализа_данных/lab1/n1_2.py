@@ -1,9 +1,20 @@
 from matplotlib import pyplot as plt
 
-with open("Москва_2021.txt", "r") as infile:
+with open("./Методы_статистического_анализа_данных/lab1/Москва_2021.txt", "r") as infile:
     dataraw = infile.read()
 data = [(int(item), dataraw.count(item)) for item in sorted(set(dataraw.splitlines()))]
 # print(data)
+
+
+def mean(data):
+    sum_xi_ni = 0
+    sum_ni = 0
+
+    for value, frequency in data:
+        sum_xi_ni += value * frequency
+        sum_ni += frequency
+
+    return sum_xi_ni / sum_ni
 
 # Расчет основных статистических показателей
 average = sum(k[0] * k[1] for k in data) / sum(k[1] for k in data)
@@ -40,6 +51,21 @@ excess = (
 
 print(f"Ассиметрия {assymetry:.3f}")
 print(f"Эксцесс {excess:.3f}")
+if mean(data) > median:
+    print("Ассиметрия скошена вправо") 
+elif mean < median:
+    print("Ассиметрия скошена влево")
+else:
+    print("Симметричное распределение") 
+
+if excess > 0:
+    print("Островершинное распределение") 
+elif excess < 0:
+    print("Плосковершинное распределение")
+else:
+    print("Нормальное распределение") 
+print(mean(data))
+print(median)
 
 threshold = 0.5
 three_sigma_rule = {1: 68.3, 2: 95.4, 3: 99.7}
@@ -54,7 +80,7 @@ for i in range(1, 4):
     count_in_interval = sum(item[1] for item in in_interval)
     percentage_in_interval = count_in_interval / total * 100
 
-    print(f"Интервал [{low:.3f}, {high:.3f}]")
+    print(f"{i} сигмовый ряд [{low:.3f}, {high:.3f}]")
     print(f"Процент реализаций в интервале {i} сигм: {percentage_in_interval:.3f}%")
 
     if abs(three_sigma_rule[i] - percentage_in_interval) > threshold:
