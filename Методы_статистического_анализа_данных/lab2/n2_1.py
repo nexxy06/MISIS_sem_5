@@ -48,9 +48,6 @@ def main():
         sample_mean = mean(sample)
         sample_means.append(sample_mean)
 
-    print(f"\nВыборочные средние:")
-    for i, sm in enumerate(sample_means):
-        print(f"Выборка {i+1:2d}: {sm:.2f}")
 
     min_mean = math.floor(min(sample_means))
     max_mean = math.ceil(max(sample_means))
@@ -77,9 +74,6 @@ def main():
         print(
             f"{interval[0]:5.1f}-{interval[1]:5.1f}  {frequencies[i]:11d}  {relative_frequencies[i]:11.3f}"
         )
-
-    overall_mean = mean(sample_means)
-    overall_std = std(sample_means, ddof=1)
 
 
     x_positions = [interval[0] for interval in intervals]
@@ -109,7 +103,7 @@ def main():
     print(f"Выборочное среднее: {sample_mean:.2f}")
     print(f"Исправленное СКО: {sample_std:.2f}")
     print(f"t-значение: {t_normal}")
-    print(f"Погрешность: ±{margin:.2f}")
+    # print(f"Погрешность: ±{margin:.2f}")
     print(f"Доверительный интервал: ({conf_interval[0]:.2f}, {conf_interval[1]:.2f})")
     print(f"Ширина интервала: {conf_interval[1] - conf_interval[0]:.2f}")
 
