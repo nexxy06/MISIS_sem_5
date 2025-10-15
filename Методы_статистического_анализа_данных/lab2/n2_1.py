@@ -1,6 +1,7 @@
 import math
 import random
 import matplotlib.pyplot as plt
+import scipy.stats as stats
 
 
 def read_data(filename):
@@ -29,16 +30,18 @@ def main():
 
     ages = read_data("./Методы_статистического_анализа_данных/lab1/Москва_2021.txt")
 
-    sigma_estimate = std(ages, ddof=1)
-    t = 1.96
+    sigma_estimate = std(ages, ddof=0)
 
-    n_required = (t**2 * sigma_estimate**2) / delta**2
+    # Определение объема выборки
+    z = stats.norm.ppf((1 + gamma) / 2)  # z = 1.96 для γ = 0.95
+    n_required = (z**2 * sigma_estimate**2) / delta**2
     n = int(math.ceil(n_required))
 
     print(f"Объем генеральной совокупности: {len(ages)}")
     print(f"Средний возраст: {mean(ages):.2f}")
     print(f"Стандартное отклонение: {sigma_estimate:.2f}")
     print(f"Объем выборки: {n}")
+    print(f"z-значение (для объема выборки): {z:.3f}")
 
     # random.seed(42)
     sample_means = []
@@ -48,7 +51,7 @@ def main():
         sample_mean = mean(sample)
         sample_means.append(sample_mean)
 
-
+    # Определение границ интервалов
     min_mean = math.floor(min(sample_means))
     max_mean = math.ceil(max(sample_means))
     interval_length = 1
@@ -59,6 +62,7 @@ def main():
         intervals.append((current, current + interval_length))
         current += interval_length
 
+    # Подсчет частот
     frequencies = []
     for interval in intervals:
         count = sum(
@@ -95,18 +99,20 @@ def main():
     sample_mean = mean(demo_sample)
     sample_std = std(demo_sample, ddof=1)
 
-    t_normal = 1.96
-    margin = t_normal * sample_std / math.sqrt(n)
+    # Построение доверительного интервала для математического ожидания 
+    # при неизвестной дисперсии генеральной совокупности
+    t_student = stats.t.ppf((1 + gamma) / 2, df=n-1)  # df = n-1 степеней свободы
+
+    margin = t_student * sample_std / math.sqrt(n)
     conf_interval = (sample_mean - margin, sample_mean + margin)
 
-    print(f"\nДоверительный интервал (нормальное распределение):")
+    print(f"\nДоверительный интервал (t-распределение Стьюдента):")
     print(f"Выборочное среднее: {sample_mean:.2f}")
     print(f"Исправленное СКО: {sample_std:.2f}")
-    print(f"t-значение: {t_normal}")
-    # print(f"Погрешность: ±{margin:.2f}")
+    print(f"t-значение (Стьюдент, df={n-1}): {t_student:.3f}")
     print(f"Доверительный интервал: ({conf_interval[0]:.2f}, {conf_interval[1]:.2f})")
     print(f"Ширина интервала: {conf_interval[1] - conf_interval[0]:.2f}")
-
+    print(f"Стандартное отклонение генеральной совокупности: {sigma_estimate:.2f}")
 
 if __name__ == "__main__":
     main()
