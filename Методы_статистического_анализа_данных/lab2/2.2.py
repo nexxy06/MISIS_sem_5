@@ -4,7 +4,7 @@ from math import ceil, floor
 from matplotlib import pyplot as plt
 from scipy.stats import t
 
-random.seed(42)
+
 with open('./Методы_статистического_анализа_данных/lab1/Москва_2021.txt', 'r') as infile:
     dataraw = infile.read()
 data = [(int(item), dataraw.count(item)) for item in sorted(set(dataraw.splitlines()))]
