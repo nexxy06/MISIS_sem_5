@@ -2,7 +2,6 @@ import math
 import random
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-import numpy as np
 
 
 def read_data(filename):
@@ -19,15 +18,18 @@ def std(data, ddof=0):
     variance = sum((x - m) ** 2 for x in data) / (len(data) - ddof)
     return math.sqrt(variance)
 
+
 def linspace(start, stop, num):
     step = (stop - start) / (num - 1)
     return [start + i * step for i in range(num)]
+
 
 def norm_pdf(x, mu, sigma):
     """Функция плотности нормального распределения"""
     return (1.0 / (sigma * math.sqrt(2 * math.pi))) * math.exp(
         -0.5 * ((x - mu) / sigma) ** 2
     )
+
 
 def main():
     gamma = 0.95
@@ -133,20 +135,6 @@ def main():
             f"{interval[0]:5.1f}-{interval[1]:5.1f}  {frequencies[i]:10d}  {theoretical_frequencies[i]:9.2f}  {relative_frequencies[i]:10.3f}  {theoretical_relative_freq[i]:9.3f}"
         )
 
-    # Аппроксимация гистограммы кривой Гаусса
-    # μ (математическое ожидание) = {mu_estimate:.4f}
-    # σ (стандартное отклонение) = {sigma_estimate_interval:.4f}
-
-    # Проверка качества аппроксимации (хи-квадрат)
-    # chi_squared = 0
-    # for i in range(len(frequencies)):
-    #     if theoretical_frequencies[i] > 0:
-    #         chi_squared += (
-    #             frequencies[i] - theoretical_frequencies[i]
-    #         ) ** 2 / theoretical_frequencies[i]
-
-    # print(f"Статистика хи-квадрат для проверки аппроксимации: {chi_squared:.4f}")
-
     # Построение гистограммы с кривой Гаусса (аппроксимация)
     plt.figure(figsize=(14, 8))
 
@@ -165,12 +153,12 @@ def main():
     )
 
     # Аппроксимирующая кривая Гаусса
-    x_min = min_mean
-    x_max = max_mean
-    x_curve = linspace(x_min, x_max, 1000)
+    x_curve = linspace(min_mean, max_mean, 1000)
 
     # Для правильной аппроксимации масштабируем плотность вероятности на ширину интервала
-    y_curve = [norm_pdf(x, mu_estimate, sigma_estimate_interval) * width for x in x_curve]
+    y_curve = [
+        norm_pdf(x, mu_estimate, sigma_estimate_interval) * width for x in x_curve
+    ]
 
     plt.plot(
         x_curve,
@@ -215,7 +203,7 @@ def main():
     print(f"Точечная оценка математического ожидания: {sample_mean_age:.3f}")
     print(f"Исправленное стандартное отклонение: {sample_std_age:.3f}")
     print(f"Квантиль распределения Стьюдента (t-значение): {t_value:.3f}")
-    print(f"Точность оценки (полуширина интервала): {margin_error:.3f}")
+    print(f"Точность выборочного среднего: {margin_error:.3f}")
     print(
         f"Доверительный интервал ({gamma*100}%): ({confidence_interval[0]:.3f}, {confidence_interval[1]:.3f})"
     )
