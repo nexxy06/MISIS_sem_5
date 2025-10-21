@@ -123,16 +123,11 @@ def main():
         theoretical_freq = prob * total_frequency
         theoretical_frequencies.append(theoretical_freq)
 
-    # Относительные теоретические частоты
-    theoretical_relative_freq = [
-        freq / total_frequency for freq in theoretical_frequencies
-    ]
-
     print(f"\nВыравнивание статистического ряда:")
-    print("Интервал       Набл.част. Теор.част. Набл.отн.ч. Теор.отн.ч.")
+    print("Интервал       Набл.част. Набл.отн.частота")
     for i, interval in enumerate(intervals):
         print(
-            f"{interval[0]:5.1f}-{interval[1]:5.1f}  {frequencies[i]:10d}  {theoretical_frequencies[i]:9.2f}  {relative_frequencies[i]:10.3f}  {theoretical_relative_freq[i]:9.3f}"
+            f"{interval[0]:5.1f}-{interval[1]:5.1f}  {frequencies[i]:10d} {relative_frequencies[i]:10.3f}"
         )
 
     # Построение гистограммы с кривой Гаусса (аппроксимация)
