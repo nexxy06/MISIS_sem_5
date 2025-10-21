@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 from scipy.stats import t
 listik = [int(line.strip()) for line in open('./Методы_статистического_анализа_данных/lab1/Москва_2021.txt', encoding='utf-8').readlines()]
 
+random.seed(42)
 y = 0.95  # надёжность
 table_error_koef = 1.96  # кэф ошибки по таблице
-precision = 3  # δ = 3 года 
+precision = 3  # δ = 3 года
 
 
 def dispersion(data):
@@ -66,7 +67,7 @@ def interval(data, interval_length=1):
         upper = lower + h
         count = sum(1 for x in data if lower <= x < upper)
         intervals.append([lower, upper, count])
-        lower = upper
+        lower = upper    
 
     print("\n -- Интервальный ряд --")
     total = len(data)
@@ -112,7 +113,7 @@ mean_of_means = sum(means) / len(means)
 
 delta = table_error_koef * sigma / math.sqrt(n)
 
-t_val = table_error_koef  
+t_val = table_error_koef
 lower_bound = mean_of_means - t_val * sigma_fixed / math.sqrt(n)
 upper_bound = mean_of_means + t_val * sigma_fixed / math.sqrt(n)
 
